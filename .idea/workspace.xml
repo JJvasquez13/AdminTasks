@@ -4,14 +4,25 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="71ae7ae9-1ec4-42ae-88a1-695dbfa973c8" name="Changes" comment="" />
+    <list default="true" id="71ae7ae9-1ec4-42ae-88a1-695dbfa973c8" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database.rules.json" beforeDir="false" afterPath="$PROJECT_DIR$/database.rules.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/public/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/src/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/src/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/src/tasks/create.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/src/tasks/create.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/src/tasks/delete.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/src/tasks/delete.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/src/tasks/read.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/src/tasks/read.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/src/tasks/update.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/src/tasks/update.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/styles.css" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/AdminTasks" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 3
@@ -60,6 +71,7 @@
       <option name="presentableId" value="Default" />
       <updated>1753661225000</updated>
       <workItem from="1753661226358" duration="8702000" />
+      <workItem from="1753670026348" duration="3189000" />
     </task>
     <servers />
   </component>
