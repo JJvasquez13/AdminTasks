@@ -1,4 +1,4 @@
-export default function TaskTable() {
+export default function TaskTable({ tasks }) {
     return (
         <table className="table table-bordered table-hover">
             <thead className="table-light">
@@ -12,18 +12,26 @@ export default function TaskTable() {
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>Ejemplo</td>
-                    <td>Descripción de ejemplo</td>
-                    <td>2025-08-06</td>
-                    <td>2025-08-10</td>
-                    <td>En curso</td>
-                    <td>
-                        <button className="btn btn-sm btn-warning me-2">Editar</button>
-                        <button className="btn btn-sm btn-danger">Eliminar</button>
-                    </td>
-                </tr>
+                {tasks.map(task => (
+                    <tr key={task._id || task.id}>
+                        <td>{task.title}</td>
+                        <td>{task.description}</td>
+                        <td>{task.startDate}</td>
+                        <td>{task.dueDate}</td>
+                        <td>{task.status}</td>
+                        <td>
+                            <button className="btn btn-sm btn-warning me-2">Editar</button>
+                            <button className="btn btn-sm btn-danger">Eliminar</button>
+                        </td>
+                    </tr>
+                ))}
+                {tasks.length === 0 && (
+                    <tr>
+                        <td colSpan="6" className="text-center">No hay tareas aún</td>
+                    </tr>
+                )}
             </tbody>
+
         </table>
-    )
+    );
 }
