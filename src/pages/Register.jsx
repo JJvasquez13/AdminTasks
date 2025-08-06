@@ -1,40 +1,54 @@
-import { useState, useEffect } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
-import api from '../api/axiosInstance'
+import { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import api from '../api/axiosInstance';
+import { toast } from 'react-toastify';
 
 export default function Register() {
-    const [username, setUsername] = useState('')
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-    const [xsrfToken, setXsrfToken] = useState('')
-    const navigate = useNavigate()
+    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [xsrfToken, setXsrfToken] = useState('');
+    const navigate = useNavigate();
 
     useEffect(() => {
         api.get('/')
             .then(() => {
-                const token = getCookie('XSRF-TOKEN')
-                if (token) setXsrfToken(token)
+                const token = document.cookie.match(new RegExp('(^| )XSRF-TOKEN=([^;]+)'))?.[2];
+                console.log('XSRF-TOKEN obtenido:', token);
+                if (token) setXsrfToken(token);
             })
-            .catch(err => console.error('Error al obtener XSRF-TOKEN', err))
-    }, [])
-
-    const getCookie = (name) => {
-        const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'))
-        return match ? decodeURIComponent(match[2]) : ''
-    }
+            .catch(err => console.error('Error al obtener XSRF-TOKEN:', err));
+    }, []);
 
     const handleRegister = async (e) => {
-        e.preventDefault()
+        e.preventDefault();
         try {
-            await api.post('/auth/register',
-                { username, email, password },
-                { headers: { 'X-XSRF-TOKEN': xsrfToken } }
-            )
-            navigate('/login')
+            await api.post('/auth/register', { username, email, password }, {
+                headers: { 'X-XSRF-TOKEN': xsrfToken }
+            });
+            toast.success('Registro exitoso. Por favor, inicia sesión.', {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+            navigate('/login');
         } catch (err) {
-            alert('Error al registrar usuario')
+            console.error('Error en registro:', err.response?.data || err.message);
+            toast.error(err.response?.data?.message || 'Error al registrar usuario', {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
         }
-    }
+    };
 
     return (
         <div className="container mt-5">
@@ -58,5 +72,5 @@ export default function Register() {
                 </p>
             </form>
         </div>
-    )
+    );
 }
