@@ -5,7 +5,8 @@ export default function TaskForm({ onAddTask }) {
     const [description, setDescription] = useState('');
     const [startDate, setStartDate] = useState('');
     const [dueDate, setDueDate] = useState('');
-    const [status, setStatus] = useState('en curso');
+    const [status, setStatus] = useState('Sin iniciar');
+
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -26,7 +27,7 @@ export default function TaskForm({ onAddTask }) {
         setDescription('');
         setStartDate('');
         setDueDate('');
-        setStatus('en curso');
+        setStatus('Sin iniciar');
     };
 
     return (
@@ -72,9 +73,13 @@ export default function TaskForm({ onAddTask }) {
                         value={status}
                         onChange={e => setStatus(e.target.value)}
                     >
-                        <option value="en curso">En curso</option>
-                        <option value="completado">Finalizado</option>
+                        <option value="Sin iniciar">Sin iniciar</option>
+                        <option value="En curso">En curso</option>
+                        <option value="Completado">Completado</option>
                     </select>
+
+
+
                 </div>
                 <div className="col-12">
                     <button className="btn btn-primary w-100">Agregar tarea</button>
