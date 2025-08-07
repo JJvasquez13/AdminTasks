@@ -1,9 +1,13 @@
 import { useState, useEffect } from "react";
-import Swal from "sweetalert2";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { FaTrash } from "react-icons/fa";
 
-export default function TaskEditor({ task, onCancel, onSave, onDelete }) {
+export default function TaskEditor({
+  task,
+  onCancel,
+  onSave,
+  onDelete,
+  onError,
+}) {
   const MAX_SHORT = 75;
   const MAX_LONG = 2000;
 
@@ -15,14 +19,27 @@ export default function TaskEditor({ task, onCancel, onSave, onDelete }) {
   const [status, setStatus] = useState("Sin iniciar");
   const [charsLeftShort, setCharsLeftShort] = useState(MAX_SHORT);
   const [charsLeftLong, setCharsLeftLong] = useState(MAX_LONG);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const formatToYYYYMMDD = (dateString) => {
+    if (!dateString) return "";
+    const [day, month, year] = dateString.split("/");
+    return `${year}-${month}-${day}`;
+  };
+
+  const formatToDDMMYYYY = (dateString) => {
+    if (!dateString) return "";
+    const [year, month, day] = dateString.split("-");
+    return `${day}/${month}/${year}`;
+  };
 
   useEffect(() => {
     if (task) {
       setTitle(task.title || "");
       setDescription(task.description || "");
       setLongDescription(task.longDescription || "");
-      setStartDate(task.startDate ? task.startDate.slice(0, 10) : "");
-      setDueDate(task.dueDate ? task.dueDate.slice(0, 10) : "");
+      setStartDate(task.startDate || "");
+      setDueDate(task.dueDate || "");
       setStatus(task.status || "Sin iniciar");
       setCharsLeftShort(
         MAX_SHORT - (task.description ? task.description.length : 0)
@@ -39,7 +56,7 @@ export default function TaskEditor({ task, onCancel, onSave, onDelete }) {
       setDescription(text);
       setCharsLeftShort(MAX_SHORT - text.length);
     } else {
-      toast.error(
+      onError(
         "Alcanzó el límite máximo de caracteres (75) para la descripción corta"
       );
     }
@@ -51,78 +68,111 @@ export default function TaskEditor({ task, onCancel, onSave, onDelete }) {
       setLongDescription(text);
       setCharsLeftLong(MAX_LONG - text.length);
     } else {
-      toast.error(
+      onError(
         "Alcanzó el límite máximo de caracteres (2000) para la descripción larga"
       );
     }
   };
 
+  const handleStartDateChange = (e) => {
+    const date = e.target.value;
+    setStartDate(formatToDDMMYYYY(date));
+  };
+
+  const handleDueDateChange = (e) => {
+    const date = e.target.value;
+    setDueDate(formatToDDMMYYYY(date));
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-
+    if (!title || !description || !startDate || !dueDate) {
+      onError("Todos los campos obligatorios deben estar completos");
+      return;
+    }
     if (description.length > MAX_SHORT) {
-      toast.error("La descripción corta no puede exceder 75 caracteres");
+      onError("La descripción corta no puede exceder 75 caracteres");
       return;
     }
-
     if (longDescription.length > MAX_LONG) {
-      toast.error("La descripción larga no puede exceder 2000 caracteres");
+      onError("La descripción larga no puede exceder 2000 caracteres");
       return;
     }
 
-    onSave({
-      ...task,
+    const [startDay, startMonth, startYear] = startDate.split("/").map(Number);
+    const [dueDay, dueMonth, dueYear] = dueDate.split("/").map(Number);
+    const startDateObj = new Date(startYear, startMonth - 1, startDay);
+    const dueDateObj = new Date(dueYear, dueMonth - 1, dueDay);
+    if (startDateObj > dueDateObj) {
+      onError(
+        "La fecha de inicio no puede ser posterior a la fecha de finalización"
+      );
+      return;
+    }
+
+    const updatedTask = {
+      _id: task._id,
       title,
       description,
       longDescription,
       startDate,
       dueDate,
       status,
-    });
+    };
+
+    onSave(updatedTask);
+    setTitle("");
+    setDescription("");
+    setLongDescription("");
+    setCharsLeftShort(MAX_SHORT);
+    setCharsLeftLong(MAX_LONG);
+    setStartDate("");
+    setDueDate("");
+    setStatus("Sin iniciar");
   };
 
   const handleDelete = () => {
-    Swal.fire({
-      title: "¿Estás seguro?",
-      text: "Esta acción eliminará la tarea permanentemente.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Sí, eliminar",
-      cancelButtonText: "Cancelar",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        onDelete(task);
-        Swal.fire("Eliminada!", "La tarea ha sido eliminada.", "success");
-      }
-    });
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDelete = () => {
+    onDelete(task._id);
+    setShowDeleteConfirm(false);
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteConfirm(false);
   };
 
   if (!task) return null;
 
   return (
     <>
-      <ToastContainer position="top-right" autoClose={3000} />
       <div
         className="modal show fade d-block"
         tabIndex="-1"
         style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
       >
         <div className="modal-dialog modal-lg">
-          <div className="modal-content">
+          <div className="modal-content" style={{ backgroundColor: "#FFFFFF" }}>
             <form onSubmit={handleSubmit}>
-              <div className="modal-header">
-                <h5 className="modal-title">Editar tarea</h5>
+              <div className="modal-header border-0">
+                <h5
+                  className="modal-title fw-bold"
+                  style={{ color: "#FFCA28" }}
+                >
+                  Editar Tarea
+                </h5>
                 <button
                   type="button"
                   className="btn-close"
                   onClick={onCancel}
+                  aria-label="Close"
                 ></button>
               </div>
               <div className="modal-body">
                 <div className="mb-3">
-                  <label>Título</label>
+                  <label className="form-label fw-semibold">Título</label>
                   <input
                     type="text"
                     className="form-control"
@@ -131,9 +181,12 @@ export default function TaskEditor({ task, onCancel, onSave, onDelete }) {
                     required
                     maxLength={50}
                   />
+                  <small className="text-muted">Máximo 50 caracteres</small>
                 </div>
                 <div className="mb-3">
-                  <label>Descripción corta</label>
+                  <label className="form-label fw-semibold">
+                    Descripción corta
+                  </label>
                   <input
                     type="text"
                     className="form-control"
@@ -146,39 +199,48 @@ export default function TaskEditor({ task, onCancel, onSave, onDelete }) {
                   </small>
                 </div>
                 <div className="mb-3">
-                  <label>Descripción larga</label>
+                  <label className="form-label fw-semibold">
+                    Descripción larga
+                  </label>
                   <textarea
                     className="form-control"
                     rows={6}
                     value={longDescription}
                     onChange={handleLongDescriptionChange}
+                    maxLength={MAX_LONG}
                   />
                   <small className="text-muted">
                     {charsLeftLong} caracteres restantes
                   </small>
                 </div>
-                <div className="mb-3">
-                  <label>Fecha Inicio</label>
-                  <input
-                    type="date"
-                    className="form-control"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    required
-                  />
+                <div className="row">
+                  <div className="col-md-6 mb-3">
+                    <label className="form-label fw-semibold">
+                      Fecha de Inicio
+                    </label>
+                    <input
+                      type="date"
+                      className="form-control"
+                      value={startDate ? formatToYYYYMMDD(startDate) : ""}
+                      onChange={handleStartDateChange}
+                      required
+                    />
+                  </div>
+                  <div className="col-md-6 mb-3">
+                    <label className="form-label fw-semibold">
+                      Fecha de Finalización
+                    </label>
+                    <input
+                      type="date"
+                      className="form-control"
+                      value={dueDate ? formatToYYYYMMDD(dueDate) : ""}
+                      onChange={handleDueDateChange}
+                      required
+                    />
+                  </div>
                 </div>
                 <div className="mb-3">
-                  <label>Fecha Final</label>
-                  <input
-                    type="date"
-                    className="form-control"
-                    value={dueDate}
-                    onChange={(e) => setDueDate(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="mb-3">
-                  <label>Estado</label>
+                  <label className="form-label fw-semibold">Estado</label>
                   <select
                     className="form-select"
                     value={status}
@@ -190,29 +252,84 @@ export default function TaskEditor({ task, onCancel, onSave, onDelete }) {
                   </select>
                 </div>
               </div>
-              <div className="modal-footer">
-                <button type="submit" className="btn btn-primary">
-                  Guardar
-                </button>
+              <div className="modal-footer border-0">
                 <button
                   type="button"
-                  className="btn btn-danger"
+                  className="btn btn-outline-danger me-2"
                   onClick={handleDelete}
                 >
-                  Eliminar
+                  <FaTrash className="me-1" /> Eliminar
                 </button>
                 <button
                   type="button"
-                  className="btn btn-secondary"
+                  className="btn btn-outline-dark"
+                  style={{ color: "#2C3E50", borderColor: "#2C3E50" }}
                   onClick={onCancel}
                 >
                   Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="btn"
+                  style={{ backgroundColor: "#FFB300", color: "#2C3E50" }}
+                >
+                  Guardar
                 </button>
               </div>
             </form>
           </div>
         </div>
       </div>
+      {showDeleteConfirm && (
+        <div
+          className="modal show fade d-block"
+          tabIndex="-1"
+          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+        >
+          <div className="modal-dialog modal-dialog-centered">
+            <div
+              className="modal-content"
+              style={{ backgroundColor: "#FFFFFF" }}
+            >
+              <div className="modal-header border-0">
+                <h5
+                  className="modal-title fw-bold"
+                  style={{ color: "#FFCA28" }}
+                >
+                  Confirmar Eliminación
+                </h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={cancelDelete}
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div className="modal-body">
+                <p>¿Estás seguro de que quieres eliminar la tarea "{title}"?</p>
+              </div>
+              <div className="modal-footer border-0">
+                <button
+                  type="button"
+                  className="btn btn-outline-dark"
+                  style={{ color: "#2C3E50", borderColor: "#2C3E50" }}
+                  onClick={cancelDelete}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  className="btn"
+                  style={{ backgroundColor: "#E74C3C", color: "#FFFFFF" }}
+                  onClick={confirmDelete}
+                >
+                  Eliminar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
