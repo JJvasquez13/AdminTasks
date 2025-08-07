@@ -5,6 +5,8 @@ import Register from './pages/Register'
 import Home from './pages/Home'
 import NavBar from './components/NavBar'
 import { getProfile } from './api/authService'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 const ProtectedRoute = ({ children }) => {
   const [user, setUser] = useState(null)
@@ -47,6 +49,7 @@ export default function App() {
           }
         />
       </Routes>
+      <ToastContainer position="top-right" autoClose={1000} />
     </>
   )
 }

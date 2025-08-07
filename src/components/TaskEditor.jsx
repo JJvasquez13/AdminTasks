@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 export default function TaskEditor({ task, onCancel, onSave, onDelete }) {
   const MAX_SHORT = 75;
@@ -39,9 +37,13 @@ export default function TaskEditor({ task, onCancel, onSave, onDelete }) {
       setDescription(text);
       setCharsLeftShort(MAX_SHORT - text.length);
     } else {
-      toast.error(
-        "Alcanzó el límite máximo de caracteres (75) para la descripción corta"
-      );
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Alcanzó el límite máximo de caracteres (75) para la descripción corta",
+        timer: 2000,
+        showConfirmButton: false,
+      });
     }
   };
 
@@ -51,9 +53,13 @@ export default function TaskEditor({ task, onCancel, onSave, onDelete }) {
       setLongDescription(text);
       setCharsLeftLong(MAX_LONG - text.length);
     } else {
-      toast.error(
-        "Alcanzó el límite máximo de caracteres (2000) para la descripción larga"
-      );
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Alcanzó el límite máximo de caracteres (2000) para la descripción larga",
+        timer: 2000,
+        showConfirmButton: false,
+      });
     }
   };
 
@@ -61,12 +67,24 @@ export default function TaskEditor({ task, onCancel, onSave, onDelete }) {
     e.preventDefault();
 
     if (description.length > MAX_SHORT) {
-      toast.error("La descripción corta no puede exceder 75 caracteres");
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "La descripción corta no puede exceder 75 caracteres",
+        timer: 2000,
+        showConfirmButton: false,
+      });
       return;
     }
 
     if (longDescription.length > MAX_LONG) {
-      toast.error("La descripción larga no puede exceder 2000 caracteres");
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "La descripción larga no puede exceder 2000 caracteres",
+        timer: 2000,
+        showConfirmButton: false,
+      });
       return;
     }
 
@@ -78,6 +96,14 @@ export default function TaskEditor({ task, onCancel, onSave, onDelete }) {
       startDate,
       dueDate,
       status,
+    });
+
+    Swal.fire({
+      icon: "success",
+      title: "Actualizada",
+      text: "La tarea ha sido actualizada.",
+      timer: 1500,
+      showConfirmButton: false,
     });
   };
 
@@ -102,117 +128,110 @@ export default function TaskEditor({ task, onCancel, onSave, onDelete }) {
   if (!task) return null;
 
   return (
-    <>
-      <ToastContainer position="top-right" autoClose={3000} />
-      <div
-        className="modal show fade d-block"
-        tabIndex="-1"
-        style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
-      >
-        <div className="modal-dialog modal-lg">
-          <div className="modal-content">
-            <form onSubmit={handleSubmit}>
-              <div className="modal-header">
-                <h5 className="modal-title">Editar tarea</h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={onCancel}
-                ></button>
+    <div
+      className="modal show fade d-block"
+      tabIndex="-1"
+      style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+    >
+      <div className="modal-dialog modal-lg">
+        <div className="modal-content">
+          <form onSubmit={handleSubmit}>
+            <div className="modal-header">
+              <h5 className="modal-title">Editar tarea</h5>
+              <button
+                type="button"
+                className="btn-close"
+                onClick={onCancel}
+              ></button>
+            </div>
+            <div className="modal-body">
+              <div className="mb-3">
+                <label>Título</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  required
+                  maxLength={50}
+                />
               </div>
-              <div className="modal-body">
-                <div className="mb-3">
-                  <label>Título</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    required
-                    maxLength={50}
-                  />
-                </div>
-                <div className="mb-3">
-                  <label>Descripción corta</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    value={description}
-                    onChange={handleDescriptionChange}
-                    required
-                  />
-                  <small className="text-muted">
-                    {charsLeftShort} caracteres restantes
-                  </small>
-                </div>
-                <div className="mb-3">
-                  <label>Descripción larga</label>
-                  <textarea
-                    className="form-control"
-                    rows={6}
-                    value={longDescription}
-                    onChange={handleLongDescriptionChange}
-                  />
-                  <small className="text-muted">
-                    {charsLeftLong} caracteres restantes
-                  </small>
-                </div>
-                <div className="mb-3">
-                  <label>Fecha Inicio</label>
-                  <input
-                    type="date"
-                    className="form-control"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="mb-3">
-                  <label>Fecha Final</label>
-                  <input
-                    type="date"
-                    className="form-control"
-                    value={dueDate}
-                    onChange={(e) => setDueDate(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="mb-3">
-                  <label>Estado</label>
-                  <select
-                    className="form-select"
-                    value={status}
-                    onChange={(e) => setStatus(e.target.value)}
-                  >
-                    <option value="Sin iniciar">Sin iniciar</option>
-                    <option value="En curso">En curso</option>
-                    <option value="Completado">Completado</option>
-                  </select>
-                </div>
+              <div className="mb-3">
+                <label>Descripción corta</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={description}
+                  onChange={handleDescriptionChange}
+                  required
+                />
+                <small className="text-muted">{charsLeftShort} caracteres restantes</small>
               </div>
-              <div className="modal-footer">
-                <button type="submit" className="btn btn-primary">
-                  Guardar
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-danger"
-                  onClick={handleDelete}
+              <div className="mb-3">
+                <label>Descripción larga</label>
+                <textarea
+                  className="form-control"
+                  rows={6}
+                  value={longDescription}
+                  onChange={handleLongDescriptionChange}
+                />
+                <small className="text-muted">{charsLeftLong} caracteres restantes</small>
+              </div>
+              <div className="mb-3">
+                <label>Fecha Inicio</label>
+                <input
+                  type="date"
+                  className="form-control"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="mb-3">
+                <label>Fecha Final</label>
+                <input
+                  type="date"
+                  className="form-control"
+                  value={dueDate}
+                  onChange={(e) => setDueDate(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="mb-3">
+                <label>Estado</label>
+                <select
+                  className="form-select"
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value)}
                 >
-                  Eliminar
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={onCancel}
-                >
-                  Cancelar
-                </button>
+                  <option value="Sin iniciar">Sin iniciar</option>
+                  <option value="En curso">En curso</option>
+                  <option value="Completado">Completado</option>
+                </select>
               </div>
-            </form>
-          </div>
+            </div>
+            <div className="modal-footer">
+              <button type="submit" className="btn btn-primary">
+                Guardar
+              </button>
+              <button
+                type="button"
+                className="btn btn-danger"
+                onClick={handleDelete}
+              >
+                Eliminar
+              </button>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={onCancel}
+              >
+                Cancelar
+              </button>
+            </div>
+          </form>
         </div>
       </div>
-    </>
+    </div>
   );
 }

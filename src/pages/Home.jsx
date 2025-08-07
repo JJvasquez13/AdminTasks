@@ -3,7 +3,7 @@ import TaskForm from "../components/TaskForm";
 import TaskTable from "../components/TaskTable";
 import TaskEditor from "../components/TaskEditor";
 import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -48,13 +48,12 @@ export default function Home() {
         credentials: "include",
         body: JSON.stringify(taskData),
       });
-      if (!res.ok) {
-        throw new Error("Error al agregar tarea");
-      }
+      if (!res.ok) throw new Error("Error al agregar tarea");
       const newTask = await res.json();
       setTasks([...tasks, newTask]);
+      await Swal.fire("Éxito", "Tarea agregada con éxito", "success");
     } catch (err) {
-      console.error("Error al agregar tarea:", err);
+      await Swal.fire("Error", "Error al agregar tarea", "error");
     }
   };
 
@@ -69,14 +68,13 @@ export default function Home() {
         credentials: "include",
         body: JSON.stringify(taskData),
       });
-      if (!res.ok) {
-        throw new Error("Error al actualizar tarea");
-      }
+      if (!res.ok) throw new Error("Error al actualizar tarea");
       const updatedTask = await res.json();
       setTasks(tasks.map((t) => (t._id === updatedTask._id ? updatedTask : t)));
       setSelectedTask(null);
-    } catch (err) {
-      console.error("Error al actualizar tarea:", err);
+      await Swal.fire("Éxito", "Tarea actualizada con éxito", "success");
+    } catch {
+      await Swal.fire("Error", "Error al actualizar tarea", "error");
     }
   };
 
@@ -91,26 +89,54 @@ export default function Home() {
       if (!res.ok) throw new Error("Error al eliminar tarea");
       setTasks(tasks.filter((t) => t._id !== task._id));
       setSelectedTask(null);
-      toast.success("Tarea eliminada");
-    } catch (err) {
-      toast.error("Error al eliminar tarea");
+      await Swal.fire("Éxito", "Tarea eliminada con éxito", "success");
+    } catch {
+      await Swal.fire("Error", "Error al eliminar tarea", "error");
     }
   };
 
-  if (loading) return <div className="container mt-5">Cargando...</div>;
+  if (loading)
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <div className="spinner-border text-primary" role="status" />
+      </div>
+    );
   if (!user) return null;
 
   return (
-    <div className="container mt-5">
-      <h2 className="mb-4">Bienvenido, {user.username || "Usuario"}</h2>
-      <TaskForm onAddTask={addTask} />
-      <TaskTable tasks={tasks} onSelectTask={setSelectedTask} />
-      <TaskEditor
-        task={selectedTask}
-        onCancel={() => setSelectedTask(null)}
-        onSave={updateTask}
-        onDelete={deleteTask}
-      />
-    </div>
+    <main className="container py-5" style={{ maxWidth: "1200px" }}>
+      <section className="mb-4 text-center">
+        <h1 className="fw-bold mb-1">Hola, {user.username || "Usuario"}</h1>
+        <p className="text-secondary mb-0">Gestiona tus tareas fácilmente</p>
+      </section>
+
+      <section className="mb-5">
+        <h2 className="h5 text-primary mb-3">Nueva Tarea</h2>
+        <div className="border rounded p-4" style={{ backgroundColor: "#f9fafb" }}>
+          <TaskForm onAddTask={addTask} />
+        </div>
+      </section>
+
+      {selectedTask && (
+        <section className="mb-5">
+          <h2 className="h5 text-info mb-3">Editar Tarea</h2>
+          <div className="border rounded p-4" style={{ backgroundColor: "#f1f5f9" }}>
+            <TaskEditor
+              task={selectedTask}
+              onCancel={() => setSelectedTask(null)}
+              onSave={updateTask}
+              onDelete={deleteTask}
+            />
+          </div>
+        </section>
+      )}
+
+      <section>
+        <h2 className="h5 text-success mb-3">Lista de Tareas</h2>
+        <div className="border rounded p-3" style={{ backgroundColor: "#fefefe" }}>
+          <TaskTable tasks={tasks} onSelectTask={setSelectedTask} />
+        </div>
+      </section>
+    </main>
   );
 }
