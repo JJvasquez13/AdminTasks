@@ -20,7 +20,7 @@ Abrir el proyecto en VS Code
 
 Abrir la terminar en VS Code (crtl + ñ)
 
-Ejecutar el comando <<npm install>> para instalar todas las dependencias necesarias
+Ejecutar el comando <npm install> para instalar todas las dependencias necesarias
 
 Ejecutar el comando <<npm run dev>> para ejecutar el proyecto
 
